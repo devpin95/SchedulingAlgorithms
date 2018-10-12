@@ -40,22 +40,22 @@ public:
 //    LinkedList& operator=( const LinkedList& );
     void printVals( void ) const ;
 
+    class LLIterator {
+    public:
+        // TODO DO THE MOV OP
+        LLIterator( ) { /* EMPTY BODY */ };
+        LLIterator( Node* n ) { ptr = n; };
+        LLIterator( const LLIterator& l ) { ptr = l.ptr; };
+        LLIterator& operator=( const LLIterator& l ) { ptr = l.ptr; };
+        const PCB& operator*( ) { if (  ptr != nullptr ) return ptr->data; };
+        void operator++( ) { if (  ptr != nullptr ) ptr = ptr->next; };
+    private:
+        Node* ptr = nullptr;
+    };
+
 private:
     Node* headPtr = nullptr;
     unsigned int size = 0;
-};
-
-class LLIterator {
-public:
-    // TODO DO THE MOV OP
-    LLIterator( ) { /* EMPTY BODY */ };
-    LLIterator( Node* n ) { ptr = n; };
-    LLIterator( const LLIterator& l ) { this.ptr = l.ptr; };
-    LLIterator& operator=( const LLIterator& l ) { this.ptr = l.ptr; };
-    const PCB& operator*( ) { if (  ptr != nullptr ) return ptr->data; };
-    void operator++( ) { if (  ptr != nullptr ) ptr = ptr->next; };
-private:
-    Node* ptr = nullptr;
 };
 
 
