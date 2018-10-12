@@ -3,13 +3,13 @@
 // Description: Interface of the LinkedList class
 // Last Updated: February 20, 2017
 
-#ifndef HW5_LINKEDLIST_H
-#define HW5_LINKEDLIST_H
+#ifndef LINKEDLIST_H
+#define LINKEDLIST_H
 
 #include "Node.h"
 #include "PCB.h"
 
-
+class LLIterator;
 typedef struct PCB T;
 
 class LinkedList {
@@ -25,6 +25,10 @@ public:
     bool deleteAtBack( void );
     bool insertBeforePosition( int, const T& );
     bool deleteBeforePosition( int );
+
+    LLIterator begin( void ) const;
+    LLIterator end( void ) const;
+
 //    friend LinkedList& operator+( const LinkedList&, const LinkedList& );
 //    friend LinkedList& operator-( const LinkedList&, const LinkedList& );
 
@@ -41,5 +45,18 @@ private:
     unsigned int size = 0;
 };
 
+class LLIterator {
+public:
+    // TODO DO THE MOV OP
+    LLIterator( ) { /* EMPTY BODY */ };
+    LLIterator( Node* n ) { ptr = n; };
+    LLIterator( const LLIterator& l ) { this.ptr = l.ptr; };
+    LLIterator& operator=( const LLIterator& l ) { this.ptr = l.ptr; };
+    const PCB& operator*( ) { if (  ptr != nullptr ) return ptr->data; };
+    void operator++( ) { if (  ptr != nullptr ) ptr = ptr->next; };
+private:
+    Node* ptr = nullptr;
+};
 
-#endif //HW5_LINKEDLIST_H
+
+#endif //LINKEDLIST_H
