@@ -15,7 +15,7 @@ typedef struct PCB T;
 class LinkedList {
 public:
     //required functions
-    LinkedList( void );
+    LinkedList( void ) = default;
     LinkedList( const LinkedList& );
     ~LinkedList( void );
     bool insertAtFront( const T& );
@@ -25,9 +25,6 @@ public:
     bool deleteAtBack( void );
     bool insertBeforePosition( int, const T& );
     bool deleteBeforePosition( int );
-
-    LLIterator begin( void ) const;
-    LLIterator end( void ) const;
 
 //    friend LinkedList& operator+( const LinkedList&, const LinkedList& );
 //    friend LinkedList& operator-( const LinkedList&, const LinkedList& );
@@ -43,15 +40,25 @@ public:
     class LLIterator {
     public:
         // TODO DO THE MOV OP
-        LLIterator( ) { /* EMPTY BODY */ };
-        LLIterator( Node* n ) { ptr = n; };
+        LLIterator( ) = default;
+        explicit LLIterator( Node* n ) { ptr = n; };
         LLIterator( const LLIterator& l ) { ptr = l.ptr; };
-        LLIterator& operator=( const LLIterator& l ) { ptr = l.ptr; };
+        LLIterator& operator=( const LLIterator& l ) {
+            if ( &l == this ) {
+                return *this;
+            }
+            ptr = l.ptr;
+            return *this;
+        };
         const PCB& operator*( ) { if (  ptr != nullptr ) return ptr->data; };
         void operator++( ) { if (  ptr != nullptr ) ptr = ptr->next; };
+        bool operator!=( const LLIterator &l ) { return ptr != l.ptr;  };
     private:
         Node* ptr = nullptr;
     };
+
+    LLIterator begin( void ) const { return LLIterator(headPtr); };
+    LLIterator end( void ) const { return LLIterator(nullptr); };
 
 private:
     Node* headPtr = nullptr;

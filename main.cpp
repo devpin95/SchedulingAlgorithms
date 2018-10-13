@@ -8,6 +8,12 @@
 // file format
 // pid      arrival time      CPU burst time
 
+void testLL( LinkedList& ll ) {
+    for ( auto i = ll.begin(); i != ll.end(); ++i ) {
+        std::cout << (*i).pid << "\t";
+    }
+}
+
 int main() {
     LinkedList ll;
     int num_processes = 0;
@@ -40,9 +46,7 @@ int main() {
             }
         }
 
-        std::cout << "There are " << num_processes << " processes in the file" << std::endl;
-
-        ll.printVals();
+        testLL(ll);
 
         infile.close();
     }

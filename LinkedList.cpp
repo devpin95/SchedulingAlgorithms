@@ -6,7 +6,7 @@
 #include "LinkedList.h"
 #include <iostream>
 
-LinkedList::LinkedList() { /* EMPTY BODY */ }
+//LinkedList::LinkedList() { /* EMPTY BODY */ }
 
 LinkedList::LinkedList( const LinkedList& in ) { //COPY CONSTRUCTOR
     //Step through the in linked list and copy the values into the new linked list
