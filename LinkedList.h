@@ -26,15 +26,10 @@ public:
     bool insertBeforePosition( int, const T& );
     bool deleteBeforePosition( int );
 
-//    friend LinkedList& operator+( const LinkedList&, const LinkedList& );
-//    friend LinkedList& operator-( const LinkedList&, const LinkedList& );
 
     //helper functions
-//    void removeDuplicates( void );
     void clear( void );
-//    bool isPresent( const T& ) const;
-//    unsigned int frequency( const T& ) const;
-//    LinkedList& operator=( const LinkedList& );
+    inline bool empty() const { return size == 0; }
     void printVals( void ) const ;
 
     class LLIterator {
@@ -50,7 +45,8 @@ public:
             ptr = l.ptr;
             return *this;
         };
-        const PCB& operator*( ) { if (  ptr != nullptr ) return ptr->data; };
+        const PCB& operator*( ) const { if (  ptr != nullptr ) return ptr->data; };
+        PCB& operator*( ) { if (  ptr != nullptr ) return ptr->data; };
         void operator++( ) { if (  ptr != nullptr ) ptr = ptr->next; };
         bool operator!=( const LLIterator &l ) { return ptr != l.ptr;  };
     private:

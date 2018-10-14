@@ -384,6 +384,6 @@ void LinkedList::clear() {
 void LinkedList::printVals() const {
     //step through the list and print out the data
     for ( Node* itrPtr = headPtr; itrPtr != nullptr; itrPtr = itrPtr->next ) {
-        std::cout << itrPtr->data.pid << " ";
+        std::cout << itrPtr->data.pid << "[" << itrPtr->data.remaining_burst_time << "] ";
     }
 }
