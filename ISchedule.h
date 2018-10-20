@@ -4,6 +4,8 @@
 #include "LinkedList.h"
 #include "PCB.h"
 
+#define CONTEXT_SWITCH_OVERHEAD .5
+
 class ISchedule {
 protected:
     // scheduling queues
@@ -21,13 +23,14 @@ protected:
     int num_processes = 0;
     PCB running_process;
     bool working = false;
-    bool ran = false;
 
     inline void calcStats() {
         for ( PCB proc : terminatedq ) {
+            double context_switching_time = proc.context_switches * CONTEXT_SWITCH_OVERHEAD;
             avg_wait_time += proc.waiting_time;
+            avg_wait_time += context_switching_time;
             avg_cpu_burst_time += proc.burst_time;
-            avg_turnaround_time += proc.finish_time - proc.arrival_time;
+            avg_turnaround_time += (proc.finish_time + 1 + context_switching_time) - proc.arrival_time;
             avg_response_time += proc.response_time;
         }
 
