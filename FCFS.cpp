@@ -1,7 +1,6 @@
 #include "FCFS.h"
 
 void FCFS::run() {
-    ran = true;
     int tick = 0;
     auto process_coming_in = newq.begin();
 
@@ -33,7 +32,7 @@ void FCFS::run() {
         if ( working ) {
             if ( running_process.response_time == -1 ) {
                 // this is the first time working on the process
-                running_process.response_time = tick;
+                running_process.response_time = tick - running_process.arrival_time;
             }
             // we need to do work on the currently running process
             --(running_process.remaining_burst_time);
