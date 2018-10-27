@@ -21,6 +21,10 @@ void RR::run() {
 
                 readyq.insertAtBack((*process_coming_in));
 
+                if ( (*process_coming_in).pid > highest_pid ) {
+                    highest_pid = (*process_coming_in).pid;
+                }
+
 //                std::cout << "Updated Ready Queue: ";
 //                readyq.printVals();
 //                std::cout << std::endl;
@@ -49,29 +53,25 @@ void RR::run() {
         }
         else if ( quantum_counter >= quantum ) {
             int prev_pid = running_process.pid;
-//            std::cout << std::endl << "Quantum reached by " << running_process.pid << "["
-//                      << running_process.remaining_burst_time << "]" << std::endl;
 
+            ++running_process.real_context_switches;
             readyq.insertAtBack( running_process );
             running_process = *( readyq.begin() );
-
-//            std::cout << "Ready Q: ";
-//            readyq.printVals();
-//            std::cout << std::endl;
 
             readyq.deleteAtFront();
 
             if ( tick != 0 && prev_pid != running_process.pid ) {
-//                std::cout << "Context switching (" << num_context_switches + 1 << ") to " << running_process.pid << "["
-//                          << running_process.remaining_burst_time << "]" << std::endl;
                 ++num_context_switches;
                 quantum_counter = 0;
 
                 //++running_process.context_switches;
-                std::cout << "__ ";
+//                std::cout << "__ ";
 
                 did_context_switch = true;
                 ++running_process.context_switches;
+                //++running_process.real_context_switches;
+            } else {
+                --running_process.real_context_switches;
             }
         }
 
@@ -85,20 +85,24 @@ void RR::run() {
         did_context_switch = false;
 
         if ( working ) {
+            // the time after we have worked on this cycle
+            double time = tick + 1 + (num_context_switches * CONTEXT_SWITCH_OVERHEAD);
+            // see if this is the first time working on the process
             if ( running_process.response_time == -1 ) {
-                // this is the first time working on the process
-                running_process.response_time = tick - running_process.arrival_time + ( running_process.context_switches * CONTEXT_SWITCH_OVERHEAD );
+                // this is the first time working on it so set it's response time
+                //subtract 1 because we haven't worked on this cycle yet
+                running_process.response_time = time - 1 - running_process.arrival_time;
             }
             // we need to do work on the currently running process
             --(running_process.remaining_burst_time);
 
-            std::cout << running_process.pid << " ";
+//            std::cout << running_process.pid << " ";
 
 //            std::cout << std::endl << "Q = " << quantum_counter + 1 << " " << running_process.pid << "["
 //                      << running_process.remaining_burst_time << "]" << std::endl;
 
             if ( running_process.remaining_burst_time == 0 ) {
-                running_process.finish_time = tick;
+                running_process.finish_time = time;
                 terminatedq.insertAtBack( running_process );
                 working = false;
 
@@ -113,21 +117,9 @@ void RR::run() {
         ++quantum_counter;
     }
 
+    std::cout << std::endl;
+    std::cout << "Total Time: " << tick + (num_context_switches * CONTEXT_SWITCH_OVERHEAD) << std::endl;
     calcStats();
-//    std::cout << std::endl << std::endl;
-//    for ( int i = 1; i <= 10; ++i ) {
-//        for (PCB &proc : terminatedq) {
-//            if ( proc.pid == i ) {
-//                //std::cout << proc.pid;
-//                //std::cout << "[" << proc.burst_time << "]";
-//                std::cout << "[" << proc.waiting_time << "]";
-//                //std::cout << "[" << proc.arrival_time << "]";
-//                //std::cout << "[" << proc.finish_time + 1 << "]";
-//                std::cout << "[" << proc.context_switches << "]";
-//                std::cout << std::endl;
-//                continue;
-//            }
-//        }
-//    }
-    std::cout << std::endl << std::endl;
+    printTable();
+    std::cout << std::endl;
 }
