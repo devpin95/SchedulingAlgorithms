@@ -6,40 +6,46 @@ void SRJF::run() {
     auto process_coming_in = newq.begin();
 
     while ( true ) {
-        std::cout << tick << " " << running_process.pid
-        << "[" << running_process.remaining_burst_time << "] "
-        << "------------------------------------------" << std::endl;
+//        std::cout << tick << " " << running_process.pid
+//        << "[" << running_process.remaining_burst_time << "] "
+//        << "------------------------------------------" << std::endl;
 
         if ( process_coming_in != newq.end() ) {
             if ((*process_coming_in).arrival_time == tick) {
                 // insert the new process at the back of the ready queue
-                std::cout << std::endl << "Adding process " << (*process_coming_in).pid << std::endl;
+//                std::cout << std::endl << "Adding process " << (*process_coming_in).pid << std::endl;
                 readyq.insertAtBack((*process_coming_in));
+
+                if ( (*process_coming_in).pid > highest_pid ) {
+                    highest_pid = (*process_coming_in).pid;
+                }
+
                 ++process_coming_in;
 
-                std::cout << "Ready Q: ";
-                readyq.printVals();
-                std::cout << std::endl;
+//                std::cout << "Ready Q: ";
+//                readyq.printVals();
+//                std::cout << std::endl;
 
                 if ( tick == 0 ) {
-                    std::cout << std::endl << "This is the first tick ";
+//                    std::cout << std::endl << "This is the first tick ";
                     running_process = *( readyq.begin() );
-                    std::cout << "so we are going to run " << running_process.pid << std::endl;
+//                    std::cout << "so we are going to run " << running_process.pid << std::endl;
                     readyq.deleteAtFront();
                     working = true;
                 }
                 else
                 {
-                    std::cout << std::endl << "Looking for new shortest job" << std::endl;
+//                    std::cout << std::endl << "Looking for new shortest job" << std::endl;
+                    int prev_pid = running_process.pid;
                     int runner = 0;
                     int shortest_job_pos = 0;
                     int shortest_job_time = std::numeric_limits<int>::max();
                     PCB shortest_job;
 
                     for (PCB &proc : readyq) {
-                        std::cout << "\tComparing " << running_process.pid << "["
-                            << running_process.remaining_burst_time << "] -> "
-                            << proc.pid << "[" << proc.remaining_burst_time << "]" << std::endl;
+//                        std::cout << "\tComparing " << running_process.pid << "["
+//                            << running_process.remaining_burst_time << "] -> "
+//                            << proc.pid << "[" << proc.remaining_burst_time << "]" << std::endl;
 
                         ++runner;
                         if (proc.remaining_burst_time < shortest_job_time) {
@@ -64,13 +70,15 @@ void SRJF::run() {
                             readyq.deleteBeforePosition(shortest_job_pos);
                         }
 
+                        ++running_process.real_context_switches;
                         readyq.insertAtBack(running_process);
                         running_process = shortest_job;
-                        std::cout << "Context switch to " << running_process.pid << std::endl;
+//                        std::cout << "Context switch to " << running_process.pid << std::endl;
                         ++num_context_switches;
+                        std::cout << "_";
                     } else {
-                        std::cout << "Continue working on " << running_process.pid <<
-                              "[" << running_process.remaining_burst_time << "]" << std::endl;
+//                        std::cout << "Continue working on " << running_process.pid <<
+//                              "[" << running_process.remaining_burst_time << "]" << std::endl;
                     }
 
                 }
@@ -84,10 +92,10 @@ void SRJF::run() {
 
         if ( !working ) {
             // the ready queue is not empty so we know the iterator will not be nullptr
-            std::cout << std::endl << "We finished " << running_process.pid <<
-            " and now we need to find the next one" << std::endl;
+//            std::cout << std::endl << "We finished " << running_process.pid <<
+//            " and now we need to find the next one" << std::endl;
             findAndRemoveShortestJob();
-            std::cout<< "The next process is " << running_process.pid << std::endl;
+//            std::cout<< "The next process is " << running_process.pid << std::endl;
             working = true;
         }
 
@@ -96,10 +104,16 @@ void SRJF::run() {
         }
 
         if ( working ) {
+            // the time after we have worked on this cycle
+            double time = tick + 1 + (num_context_switches * CONTEXT_SWITCH_OVERHEAD);
+
             if ( running_process.response_time == -1 ) {
                 // this is the first time working on the process
-                running_process.response_time = tick - running_process.arrival_time;
+                running_process.response_time = time - 1 - running_process.arrival_time;
             }
+
+            std::cout << running_process.pid;
+
             // we need to do work on the currently running process
             --(running_process.remaining_burst_time);
 
@@ -107,7 +121,7 @@ void SRJF::run() {
             if ( running_process.remaining_burst_time == 0 ) {
                 // it is finished
                 // set the time it finished and add it to the terminated queue
-                running_process.finish_time = tick;
+                running_process.finish_time = time;
                 terminatedq.insertAtBack( running_process );
                 working = false;
             }
@@ -116,9 +130,11 @@ void SRJF::run() {
         ++tick;
     }
 
-    std::cout << "Finished Processing" << std::endl;
 
+    std::cout << std::endl;
+    std::cout << "Total Time: " << tick + (num_context_switches * CONTEXT_SWITCH_OVERHEAD) << std::endl;
     calcStats();
+    printTable();
 }
 
 void SRJF::findAndRemoveShortestJob() {
