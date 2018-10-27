@@ -8,6 +8,11 @@ void SJF::run() {
         if ( process_coming_in != newq.end() ) {
             if ((*process_coming_in).arrival_time == tick) {
                 readyq.insertAtBack((*process_coming_in));
+
+                if ( (*process_coming_in).pid > highest_pid ) {
+                    highest_pid = (*process_coming_in).pid;
+                }
+
                 ++process_coming_in;
             }
         }
@@ -28,15 +33,16 @@ void SJF::run() {
         }
 
         if ( working ) {
+            int time = tick + 1;
             if ( running_process.response_time == -1 ) {
                 // this is the first time working on the process
-                running_process.response_time = tick - running_process.arrival_time;
+                running_process.response_time = time - 1 - running_process.arrival_time;
             }
             // we need to do work on the currently running process
             --(running_process.remaining_burst_time);
 
             if ( running_process.remaining_burst_time == 0 ) {
-                running_process.finish_time = tick;
+                running_process.finish_time = time;
                 terminatedq.insertAtBack( running_process );
                 working = false;
             }
@@ -45,7 +51,10 @@ void SJF::run() {
         ++tick;
     }
 
+    std::cout << std::endl;
+    std::cout << "Total Time: " << tick + (num_context_switches * CONTEXT_SWITCH_OVERHEAD) << std::endl;
     calcStats();
+    printTable();
 }
 
 int SJF::findAndRemoveShortestJob() {
