@@ -8,6 +8,7 @@ public:
     inline FCFS() = default;
     inline explicit FCFS( LinkedList& l ) : ISchedule(l) { };
     void run( void );
+    void setQuantum( const int &i ) {};
 };
 
 

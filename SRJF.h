@@ -9,6 +9,7 @@ public:
     inline SRJF() = default;
     inline explicit SRJF( LinkedList& l ) : ISchedule(l) { };
     void run( void );
+    void setQuantum( const int &i ) {};
 private:
     void findAndRemoveShortestJob(void);
 };
