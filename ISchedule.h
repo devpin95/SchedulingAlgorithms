@@ -92,6 +92,8 @@ public:
     inline double avgTurnaroundTime( void ) const { return avg_turnaround_time; };
     inline double avgResponseTime( void ) const { return avg_response_time; };
     inline int numContextSwitches( void ) const { return num_context_switches; };
+    virtual void run( void ) = 0;
+    virtual void setQuantum(const int &i) = 0;
 
 private:
     // print table values
