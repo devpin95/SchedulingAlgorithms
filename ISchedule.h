@@ -29,12 +29,10 @@ protected:
 
     inline void calcStats() {
         for ( PCB &proc : terminatedq ) {
-            double context_switching_time = proc.context_switches * CONTEXT_SWITCH_OVERHEAD;
-
             avg_wait_time += (proc.finish_time - proc.arrival_time) - proc.burst_time;
             avg_cpu_burst_time += proc.burst_time;
             proc.turnaround_time = proc.finish_time - proc.arrival_time;
-            avg_turnaround_time += proc.finish_time - proc.arrival_time;
+            avg_turnaround_time += proc.turnaround_time;
             avg_response_time += proc.response_time;
         }
 
@@ -83,6 +81,20 @@ protected:
         std::cout << std::left << std::setw(col_width) << std::setfill(sep) << avg_turnaround_time;
         std::cout << std::left << std::setw(col_width) << std::setfill(sep) << avg_response_time;
         std::cout << std::left << std::setw(col_width) << std::setfill(sep) << "Total: " + std::to_string(num_context_switches);
+        std::cout << std::endl;
+
+        // table headers again
+        std::cout << std::left << std::setw(col_width*8) << std::setfill('-') << "-";
+        std::cout << std::endl;
+        std::cout << std::left << std::setw(pid_width) << std::setfill(sep) << "pid";
+        std::cout << std::left << std::setw(col_width) << std::setfill(sep) << "Arrival Time";
+        std::cout << std::left << std::setw(col_width) << std::setfill(sep) << "Burst Time";
+        std::cout << std::left << std::setw(col_width) << std::setfill(sep) << "Finish Time";
+        std::cout << std::left << std::setw(col_width) << "Wait Time";
+        std::cout << std::left << std::setw(col_width) << std::setfill(sep) << "Turnaround";
+        std::cout << std::left << std::setw(col_width) << std::setfill(sep) << "Response";
+        std::cout << std::left << std::setw(col_width) << std::setfill(sep) << "Context Switches";
+        std::cout << std::endl;
     }
 public:
     inline ISchedule() = default;
