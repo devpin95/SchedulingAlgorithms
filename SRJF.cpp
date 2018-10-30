@@ -22,16 +22,17 @@ void SRJF::run() {
                     readyq.deleteAtFront();
                     working = true;
                 }
-                else
+                else if ( working )
                 {
-                    int prev_pid = running_process.pid;
+                    //int prev_pid = running_process.pid;
                     int runner = 0;
                     int shortest_job_pos = 0;
                     int shortest_job_time = std::numeric_limits<int>::max();
                     PCB shortest_job;
 
-                    for (PCB &proc : readyq) {
+                    for ( PCB &proc : readyq ) {
                         ++runner;
+
                         if (proc.remaining_burst_time < shortest_job_time) {
                             shortest_job_time = proc.remaining_burst_time;
                             shortest_job_pos = runner;
@@ -40,8 +41,9 @@ void SRJF::run() {
                     }
 
                     if (shortest_job.pid != -1
-                        && shortest_job.burst_time < running_process.remaining_burst_time
-                        && shortest_job.pid != running_process.pid) {
+                        && shortest_job.remaining_burst_time < running_process.remaining_burst_time
+                        && shortest_job.pid != running_process.pid)
+                    {
                         if ( shortest_job_pos == 1 )
                         {
                             readyq.deleteAtFront();
