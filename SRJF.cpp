@@ -6,6 +6,10 @@ void SRJF::run() {
     auto process_coming_in = newq.begin();
 
     while ( true ) {
+
+//        std::cout << tick << "   " << running_process.pid << "[" << running_process.remaining_burst_time << "]"
+//        << "---------------------------------------" << std::endl;
+
         if ( process_coming_in != newq.end() ) {
             if ((*process_coming_in).arrival_time == tick) {
                 // insert the new process at the back of the ready queue
@@ -24,24 +28,41 @@ void SRJF::run() {
                 }
                 else if ( working )
                 {
-                    //int prev_pid = running_process.pid;
+                    int prev_pid = running_process.pid;
                     int runner = 0;
                     int shortest_job_pos = 0;
                     int shortest_job_time = std::numeric_limits<int>::max();
                     PCB shortest_job;
 
-                    for ( PCB &proc : readyq ) {
+                    std::cout << std::endl << "LOOKING FOR SHORTEST REMAINING JOB " << std::endl;
+                    std::cout << running_process.pid << "[" << running_process.remaining_burst_time << "] _______ ";
+                    readyq.printVals();
+                    std::cout << std::endl << std::endl;
+
+                    for (PCB &proc : readyq) {
                         ++runner;
+
+//                        if ( shortest_job.pid != -1 ) {
+//                            std::cout << shortest_job.pid << "["
+//                                      << shortest_job.remaining_burst_time << "]";
+//                        }
 
                         if (proc.remaining_burst_time < shortest_job_time) {
                             shortest_job_time = proc.remaining_burst_time;
                             shortest_job_pos = runner;
                             shortest_job = proc;
+//                            if ( shortest_job_time < running_process.remaining_burst_time ) {
+//                                std::cout << "----->" << std::endl;
+//                            }
+//                            else {
+//                                std::cout << shortest_job.pid << "["
+//                                          << shortest_job.remaining_burst_time << "]" << std::endl;
+//                            }
                         }
                     }
 
                     if (shortest_job.pid != -1
-                        && shortest_job.remaining_burst_time < running_process.remaining_burst_time
+                        && shortest_job.burst_time < running_process.remaining_burst_time
                         && shortest_job.pid != running_process.pid)
                     {
                         if ( shortest_job_pos == 1 )
@@ -61,6 +82,12 @@ void SRJF::run() {
                         readyq.insertAtBack(running_process);
                         running_process = shortest_job;
                         ++num_context_switches;
+
+                        std::cout << "Switching to " << running_process.pid << "["
+                                  << running_process.remaining_burst_time << "]" << std::endl;
+                    } else {
+                        std::cout << "Staying on " << running_process.pid << "["
+                        << running_process.remaining_burst_time << "]" << std::endl;
                     }
                 }
             }
@@ -118,13 +145,23 @@ void SRJF::findAndRemoveShortestJob() {
     int shortest_job_pos = 0;
     int shortest_job = std::numeric_limits<int>::max();
 
+    std::cout << "******************************************************" << std::endl;
+    readyq.printVals();
+    std::cout << std::endl << std::endl;
+
     for ( PCB &proc : readyq ) {
         ++runner;
         if ( proc.remaining_burst_time < shortest_job ) {
             shortest_job = proc.remaining_burst_time;
             shortest_job_pos = runner;
             running_process = proc;
+//            std::cout << "----->" << proc.pid << "["
+//                      << proc.remaining_burst_time << "]" << std::endl;
         }
+//        else {
+//            std::cout << proc.pid << "["
+//                      << proc.remaining_burst_time << "]" << std::endl;
+//        }
     }
 
     if ( shortest_job_pos == 1 )
@@ -139,4 +176,6 @@ void SRJF::findAndRemoveShortestJob() {
     {
         readyq.deleteBeforePosition(shortest_job_pos);
     }
+    std::cout << "Now working on " << running_process.pid << "["
+              << running_process.remaining_burst_time << "]" << std::endl << std::endl;
 }
